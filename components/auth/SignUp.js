@@ -4,7 +4,12 @@ import { Container, Content } from 'native-base';
 import { Input, Button, CheckBox } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { connect } from 'react-redux';
 
+// import auth actions
+import { registerEmailPasswordUser } from '../../actions/authActions';
+
+// import styles
 import { appColor, appComplementColor } from '../../styles';
 
 // import components
@@ -29,7 +34,7 @@ class SignUp extends Component {
 
   // method to handle on press action on login button
   handleOnPressSignUp = () => {
-    // this.setState({ spinner: true });
+    this.setState({ spinner: true });
 
     const { name, email, password, rePassword, termsCheckBox } = this.state;
 
@@ -78,7 +83,18 @@ class SignUp extends Component {
       );
     }
 
-    setTimeout(() => this.props.navigation.navigate('Home'), 3000);
+    // send info to server to register the user
+    this.props
+      .registerEmailPasswordUser(name, email, password)
+      .then(() => {
+        // send user to home screen after signing in
+        this.props.navigation.navigate('Home');
+      })
+      .catch(error => {
+        this.setState({ spinner: false });
+        // display server errors
+        Alert.alert(null, error);
+      });
   };
 
   render() {
@@ -89,39 +105,40 @@ class SignUp extends Component {
         <Input
           containerStyle={{ paddingBottom: 5 }}
           inputStyle={{ paddingLeft: 10 }}
-          placeholder="full name"
+          placeholder='full name'
           onChangeText={name => this.setState({ name })}
           errorMessage={this.state.nameError}
-          leftIcon={<Icon name="id-badge" size={20} />}
+          leftIcon={<Icon name='id-badge' size={20} />}
         />
         <Input
           containerStyle={{ paddingBottom: 5 }}
           inputStyle={{ paddingLeft: 10 }}
-          placeholder="email"
+          placeholder='email'
+          autoCapitalize='none'
           onChangeText={email => this.setState({ email })}
           errorMessage={this.state.emailError}
-          leftIcon={<Icon name="envelope" size={20} />}
+          leftIcon={<Icon name='envelope' size={20} />}
         />
         <Input
           containerStyle={{ paddingVertical: 5 }}
           inputStyle={{ paddingLeft: 10 }}
-          placeholder="password"
+          placeholder='password'
           secureTextEntry
           onChangeText={password => this.setState({ password })}
           errorMessage={this.state.passwordError}
-          leftIcon={<Icon name="unlock-alt" size={20} />}
+          leftIcon={<Icon name='unlock-alt' size={20} />}
         />
         <Input
           containerStyle={{ paddingVertical: 5 }}
           inputStyle={{ paddingLeft: 10 }}
-          placeholder="confirm password"
+          placeholder='confirm password'
           secureTextEntry
           onChangeText={rePassword => this.setState({ rePassword })}
           errorMessage={this.state.rePasswordError}
-          leftIcon={<Icon name="unlock-alt" size={20} />}
+          leftIcon={<Icon name='unlock-alt' size={20} />}
         />
         <CheckBox
-          title="I agree to all the terms and conditions"
+          title='I agree to all the terms and conditions'
           checked={this.state.termsCheckBox}
           checkedColor={appColor}
           containerStyle={{
@@ -135,15 +152,14 @@ class SignUp extends Component {
         <Content style={{ alignSelf: 'center' }}>
           <Button
             containerStyle={{ paddingVertical: 5, width: 200 }}
-            title="Sign Up"
+            title='Sign Up'
             buttonStyle={{ backgroundColor: appColor }}
             onPress={() => this.handleOnPressSignUp()}
           />
         </Content>
         <Spinner
-          textContent="Loading..."
           visible={this.state.spinner}
-          size="large"
+          size='large'
           textStyle={{ color: appColor }}
           color={appColor}
         />
@@ -152,4 +168,7 @@ class SignUp extends Component {
   }
 }
 
-export default SignUp;
+export default connect(
+  null,
+  { registerEmailPasswordUser }
+)(SignUp);

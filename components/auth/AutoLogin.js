@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { View, Text } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
+import _ from 'lodash';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 // import styles
 import { appColor } from '../../styles';
@@ -11,12 +14,14 @@ class AutoLogin extends Component {
   };
 
   componentDidMount() {
-    setTimeout(() => {
-      this.setState({ spinner: false });
-
-      // navigating to Login screen, user is not logged in already
+    // check for already registered user
+    if (_.isEmpty(this.props.userInfo)) {
+      // user is not registered
       this.props.navigation.navigate('Login');
-    }, 3000);
+    } else {
+      // user is already registered
+      this.props.navigation.navigate('homeNav');
+    }
   }
 
   render() {
@@ -33,4 +38,15 @@ class AutoLogin extends Component {
   }
 }
 
-export default AutoLogin;
+AutoLogin.propTypes = {
+  userInfo: PropTypes.object.isRequired
+};
+
+const mapStateToProps = state => ({
+  userInfo: state.auth.userInfo
+});
+
+export default connect(
+  mapStateToProps,
+  null
+)(AutoLogin);
