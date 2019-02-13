@@ -4,8 +4,8 @@ import { StyleSheet } from 'react-native';
 
 // export app details
 export const appName = 'Lawyer Forum';
-export const appColor = '#0D4F7B';
-export const appComplementColor = 'white';
+export const appColor = 'white';
+export const appComplementColor = 'black';
 
 const styles = StyleSheet.create({
   header: {
@@ -13,7 +13,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   header_text: {
-    color: appComplementColor
+    color: appColor,
+    fontSize: 25
   },
   text_head: {
     fontSize: 20

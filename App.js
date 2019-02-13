@@ -21,9 +21,10 @@ import Home from './components/Home';
 import Settings from './components/Settings';
 import UserInfo from './components/UserInfo';
 import NewPost from './components/NewPost';
+import Header from './components/header/HomeHeader';
 
 // import styles
-import { appColor, appComplementColor, appBarColor } from './styles';
+import { appColor } from './styles';
 
 // login/signin scenes navigation setup
 const loginNav = createStackNavigator(
@@ -61,7 +62,7 @@ const homeNav = createMaterialTopTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Home',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name='home' size={20} color={appComplementColor} />
+          <Icon name='home' size={20} color='white' />
         )
       }
     },
@@ -70,7 +71,7 @@ const homeNav = createMaterialTopTabNavigator(
       navigationOptions: {
         tabBarLabel: 'User Info',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name='user' size={20} color={appComplementColor} />
+          <Icon name='user' size={20} color='white' />
         )
       }
     },
@@ -79,7 +80,7 @@ const homeNav = createMaterialTopTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Settings',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name='cog' size={20} color={appComplementColor} />
+          <Icon name='cog' size={20} color='white' />
         )
       }
     }
@@ -88,12 +89,22 @@ const homeNav = createMaterialTopTabNavigator(
     initialRouteName: 'Home',
     tabBarOptions: {
       style: {
-        backgroundColor: appColor
+        backgroundColor: 'black'
       },
       showIcon: true,
       showLabel: false
-    },
-    tabBarPosition: 'bottom'
+    }
+  }
+);
+
+const homeNavStack = createStackNavigator(
+  {
+    homeNav
+  },
+  {
+    defaultNavigationOptions: {
+      header: <Header />
+    }
   }
 );
 
@@ -102,7 +113,7 @@ const authNav = createSwitchNavigator(
   {
     AutoLogin,
     loginNav,
-    homeNav
+    homeNav: homeNavStack
   },
   {
     initialRouteName: 'AutoLogin'

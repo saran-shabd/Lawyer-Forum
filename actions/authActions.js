@@ -38,7 +38,7 @@ export const registerEmailPasswordUser = (
         // store user info in redux state
         dispatch({
           type: REGISTER_EMAIL_PASSWORD,
-          payload: { _id, name, email, accessToken }
+          payload: { _id, name, email, accessToken, type: 'email/password' }
         });
 
         resolve();
@@ -61,7 +61,7 @@ export const loginEmailPasswordUser = (email, password) => dispatch => {
         // store user info in redux state
         dispatch({
           type: LOGIN_EMAIL_PASSWORD,
-          payload: { _id, name, email, accessToken }
+          payload: { _id, name, email, accessToken, type: 'email/password' }
         });
 
         resolve();
@@ -92,10 +92,39 @@ export const signoutEmailPasswordUser = (id, accessToken) => dispatch => {
 
 // login users using facebook account
 export const loginFacebookUser = accessToken => dispatch => {
-  // TODO
+  return new Promise((resolve, reject) => {
+    axios
+      .post(facebookLoginRoute, { accessToken })
+      .then(serverResponse => {
+        // extract user info from response object
+        const { _id, name, email, accessToken, user_id } = serverResponse.data;
+
+        dispatch({
+          type: LOGIN_FACEBOOK,
+          payload: { _id, name, email, accessToken, user_id, type: 'facebook' }
+        });
+
+        resolve();
+      })
+      .catch(error => {
+        reject(error.response.data.message);
+      });
+  });
 };
 
 // signout users registered using facebook account
-export const signoutFacebookUser = (id, user_id, accessToken) => {
-  // TODO
+export const signoutFacebookUser = (id, user_id, accessToken) => dispatch => {
+  console.log('signoutFacebookUser action called');
+
+  return new Promise((resolve, reject) => {
+    axios
+      .post(facebookSignoutRoute, { _id: id, user_id, accessToken })
+      .then(() => {
+        dispatch({ type: SIGNOUT_FACEBOOK });
+        resolve();
+      })
+      .catch(error => {
+        reject(error.response.data.message);
+      });
+  });
 };

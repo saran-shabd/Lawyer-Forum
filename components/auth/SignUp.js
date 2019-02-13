@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { View, Alert } from 'react-native';
-import { Container, Content } from 'native-base';
-import { Input, Button, CheckBox } from 'react-native-elements';
+import { View, Alert, ImageBackground } from 'react-native';
+import { Container } from 'native-base';
+import { Input, Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { connect } from 'react-redux';
@@ -11,6 +11,9 @@ import { registerEmailPasswordUser } from '../../actions/authActions';
 
 // import styles
 import { appColor, appComplementColor } from '../../styles';
+
+// import background image
+import wallpaper from '../../backgroundWallpapers/auth.jpg';
 
 // import components
 import Header from '../header';
@@ -24,7 +27,6 @@ class SignUp extends Component {
     email: undefined,
     password: undefined,
     rePassword: undefined,
-    termsCheckBox: false,
     // input field errors
     nameError: undefined,
     emailError: undefined,
@@ -36,7 +38,7 @@ class SignUp extends Component {
   handleOnPressSignUp = () => {
     this.setState({ spinner: true });
 
-    const { name, email, password, rePassword, termsCheckBox } = this.state;
+    const { name, email, password, rePassword } = this.state;
 
     // resetting all error fields
     this.setState({
@@ -75,14 +77,6 @@ class SignUp extends Component {
       return;
     }
 
-    if (!termsCheckBox) {
-      this.setState({ spinner: false });
-      return Alert.alert(
-        null,
-        'You must agree to our terms and conditions in order to continue'
-      );
-    }
-
     // send info to server to register the user
     this.props
       .registerEmailPasswordUser(name, email, password)
@@ -100,69 +94,70 @@ class SignUp extends Component {
   render() {
     return (
       <Container>
-        <Header />
-        <View style={{ height: 100 }} />
-        <Input
-          containerStyle={{ paddingBottom: 5 }}
-          inputStyle={{ paddingLeft: 10 }}
-          placeholder='full name'
-          onChangeText={name => this.setState({ name })}
-          errorMessage={this.state.nameError}
-          leftIcon={<Icon name='id-badge' size={20} />}
-        />
-        <Input
-          containerStyle={{ paddingBottom: 5 }}
-          inputStyle={{ paddingLeft: 10 }}
-          placeholder='email'
-          autoCapitalize='none'
-          onChangeText={email => this.setState({ email })}
-          errorMessage={this.state.emailError}
-          leftIcon={<Icon name='envelope' size={20} />}
-        />
-        <Input
-          containerStyle={{ paddingVertical: 5 }}
-          inputStyle={{ paddingLeft: 10 }}
-          placeholder='password'
-          secureTextEntry
-          onChangeText={password => this.setState({ password })}
-          errorMessage={this.state.passwordError}
-          leftIcon={<Icon name='unlock-alt' size={20} />}
-        />
-        <Input
-          containerStyle={{ paddingVertical: 5 }}
-          inputStyle={{ paddingLeft: 10 }}
-          placeholder='confirm password'
-          secureTextEntry
-          onChangeText={rePassword => this.setState({ rePassword })}
-          errorMessage={this.state.rePasswordError}
-          leftIcon={<Icon name='unlock-alt' size={20} />}
-        />
-        <CheckBox
-          title='I agree to all the terms and conditions'
-          checked={this.state.termsCheckBox}
-          checkedColor={appColor}
-          containerStyle={{
-            backgroundColor: appComplementColor,
-            borderColor: appComplementColor
-          }}
-          onPress={() =>
-            this.setState({ termsCheckBox: !this.state.termsCheckBox })
-          }
-        />
-        <Content style={{ alignSelf: 'center' }}>
-          <Button
-            containerStyle={{ paddingVertical: 5, width: 200 }}
-            title='Sign Up'
-            buttonStyle={{ backgroundColor: appColor }}
-            onPress={() => this.handleOnPressSignUp()}
-          />
-        </Content>
-        <Spinner
-          visible={this.state.spinner}
-          size='large'
-          textStyle={{ color: appColor }}
-          color={appColor}
-        />
+        <Spinner visible={this.state.spinner} size='large' color={appColor} />
+        <ImageBackground
+          source={wallpaper}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <Header />
+          <View
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          >
+            <Input
+              containerStyle={{ paddingBottom: 20 }}
+              inputStyle={{ paddingLeft: 10, color: 'white' }}
+              placeholder='full name'
+              placeholderTextColor='white'
+              onChangeText={name => this.setState({ name })}
+              errorMessage={this.state.nameError}
+              leftIcon={<Icon name='id-badge' size={20} color='white' />}
+            />
+            <Input
+              containerStyle={{ paddingVertical: 20 }}
+              inputStyle={{ paddingLeft: 10, color: 'white' }}
+              placeholder='email'
+              placeholderTextColor='white'
+              autoCapitalize='none'
+              onChangeText={email => this.setState({ email })}
+              errorMessage={this.state.emailError}
+              leftIcon={<Icon name='envelope' size={20} color='white' />}
+            />
+            <Input
+              containerStyle={{ paddingVertical: 20 }}
+              inputStyle={{ paddingLeft: 10, color: 'white' }}
+              placeholder='password'
+              placeholderTextColor='white'
+              secureTextEntry
+              onChangeText={password => this.setState({ password })}
+              errorMessage={this.state.passwordError}
+              leftIcon={<Icon name='unlock-alt' size={20} color='white' />}
+            />
+            <Input
+              containerStyle={{ paddingVertical: 20 }}
+              inputStyle={{ paddingLeft: 10, color: 'white' }}
+              placeholder='confirm password'
+              placeholderTextColor='white'
+              secureTextEntry
+              onChangeText={rePassword => this.setState({ rePassword })}
+              errorMessage={this.state.rePasswordError}
+              leftIcon={<Icon name='unlock-alt' size={20} color='white' />}
+            />
+            <View style={{ paddingTop: 20 }}>
+              <Button
+                containerStyle={{ width: 200 }}
+                title='Sign Up'
+                buttonStyle={{
+                  backgroundColor: appColor,
+                  borderWidth: 1,
+                  borderColor: appColor
+                }}
+                titleStyle={{ color: appComplementColor }}
+                raised={true}
+                onPress={() => this.handleOnPressSignUp()}
+              />
+            </View>
+          </View>
+        </ImageBackground>
       </Container>
     );
   }

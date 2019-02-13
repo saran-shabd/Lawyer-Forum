@@ -1,16 +1,23 @@
 import React, { Component } from 'react';
-import { View, Alert } from 'react-native';
-import { Container, Content, Text } from 'native-base';
+import { View, Alert, ImageBackground } from 'react-native';
+import { Container, Text } from 'native-base';
 import { Input, Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { AccessToken, LoginManager } from 'react-native-fbsdk';
 import { connect } from 'react-redux';
 
 // import auth actions
-import { loginEmailPasswordUser } from '../../actions/authActions';
+import {
+  loginEmailPasswordUser,
+  loginFacebookUser
+} from '../../actions/authActions';
 
 // import styles
-import { appColor } from '../../styles';
+import styles, { appColor, appComplementColor } from '../../styles';
+
+// import backgrounnd wallpaper
+import wallpaper from '../../backgroundWallpapers/auth.jpg';
 
 // import components
 import Header from '../header/LoginHeader';
@@ -67,76 +74,117 @@ class Login extends Component {
       });
   };
 
+  handleOnPressFacebook = () => {
+    this.setState({ spinner: true });
+    try {
+      LoginManager.setLoginBehavior('web_only');
+      LoginManager.logInWithReadPermissions(['public_profile', 'email'])
+        .then(value => {
+          // user cancelled facebook login
+          if (value.isCancelled === true)
+            return this.setState({ spinner: false });
+
+          // get user access token
+          AccessToken.getCurrentAccessToken()
+            .then(accessToken => {
+              // send access token to server to login user
+              this.props
+                .loginFacebookUser(accessToken.accessToken)
+                .then(() => {
+                  // send user to home screen after logging in
+                  this.props.navigation.navigate('Home');
+                })
+                .catch(error => {
+                  this.setState({ spinner: false });
+                  Alert.alert(null, error);
+                });
+            })
+            .catch(error => {
+              this.setState({ spinner: false });
+              Alert.alert(JSON.stringify(error, undefined, 2));
+            });
+        })
+        .catch(error => {
+          this.setState({ spinner: false });
+          Alert.alert(JSON.stringify(error, undefined, 2));
+        });
+    } catch (error) {
+      this.setState({ spinner: false });
+      Alert.alert(JSON.stringify(error, undefined, 2));
+    }
+  };
+
   render() {
     return (
       <Container>
-        <Header toSignUp={() => this.props.navigation.navigate('SignUp')} />
-        <View style={{ height: 100 }} />
-        <Content>
-          <Input
-            containerStyle={{ paddingBottom: 5 }}
-            inputStyle={{ paddingLeft: 10 }}
-            placeholder='email'
-            autoCapitalize='none'
-            onChangeText={email => this.setState({ email })}
-            errorMessage={this.state.emailError}
-            leftIcon={<Icon name='envelope' size={20} />}
-          />
-          <Input
-            containerStyle={{ paddingVertical: 5 }}
-            inputStyle={{ paddingLeft: 10 }}
-            placeholder='password'
-            secureTextEntry
-            onChangeText={password => this.setState({ password })}
-            errorMessage={this.state.passwordError}
-            leftIcon={<Icon name='unlock-alt' size={20} />}
-          />
-          <View style={{ alignSelf: 'center' }}>
-            <Button
-              containerStyle={{ paddingVertical: 5, width: 200 }}
-              title='Login'
-              buttonStyle={{ backgroundColor: appColor }}
-              onPress={() => this.handleOnPressLogin()}
-            />
-          </View>
-          <Spinner
-            textView='Loading...'
-            visible={this.state.spinner}
-            size='large'
-            textStyle={{ color: appColor }}
-            color={appColor}
-          />
-        </Content>
-        {/* View for social network login buttons */}
-        <Content style={{ alignSelf: 'center', paddingTop: 20 }}>
-          <Text style={{ alignSelf: 'center' }}>OR</Text>
-          <Text style={{ paddingVertical: 5 }}>
-            Sign In using your favorite Social Network
-          </Text>
+        <Spinner visible={this.state.spinner} size='large' color={appColor} />
+        <ImageBackground
+          source={wallpaper}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <Header toSignUp={() => this.props.navigation.navigate('SignUp')} />
           <View
-            style={{
-              flexDirection: 'row',
-              alignSelf: 'center',
-              paddingVertical: 5
-            }}
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
           >
-            <Icon
-              name='google'
-              size={25}
-              style={{ alignItems: 'flex-start', paddingHorizontal: 15 }}
+            <Input
+              containerStyle={{ paddingBottom: 20 }}
+              inputStyle={{ paddingLeft: 10, color: 'white' }}
+              placeholder='email'
+              autoCapitalize='none'
+              placeholderTextColor='white'
+              onChangeText={email => this.setState({ email })}
+              errorMessage={this.state.emailError}
+              leftIcon={<Icon name='envelope' size={20} color='white' />}
             />
-            <Icon
-              name='facebook'
-              size={25}
-              style={{ alignItems: 'center', paddingHorizontal: 15 }}
+            <Input
+              containerStyle={{ paddingVertical: 20 }}
+              inputStyle={{ paddingLeft: 10, color: 'white' }}
+              placeholder='password'
+              secureTextEntry
+              placeholderTextColor='white'
+              onChangeText={password => this.setState({ password })}
+              errorMessage={this.state.passwordError}
+              leftIcon={<Icon name='unlock-alt' size={20} color='white' />}
             />
-            <Icon
-              name='twitter'
-              size={25}
-              style={{ alignItems: 'flex-start', paddingHorizontal: 15 }}
+            <View style={{ paddingVertical: 20 }}>
+              <Button
+                containerStyle={{
+                  width: 200
+                }}
+                title='Login'
+                buttonStyle={{
+                  backgroundColor: appColor,
+                  borderWidth: 1,
+                  borderColor: appColor
+                }}
+                onPress={() => this.handleOnPressLogin()}
+                titleStyle={{ color: appComplementColor }}
+                raised={true}
+              />
+            </View>
+            <Text
+              style={{
+                ...styles.text_head,
+                alignSelf: 'center',
+                paddingVertical: 30,
+                color: 'white'
+              }}
+            >
+              OR
+            </Text>
+            <Button
+              icon={<Icon name='facebook' size={20} color='#ffffff' />}
+              title='   Continue using facebook'
+              buttonStyle={{
+                backgroundColor: '#3b5998',
+                borderWidth: 1,
+                borderColor: '#3b5998'
+              }}
+              raised={true}
+              onPress={() => this.handleOnPressFacebook()}
             />
           </View>
-        </Content>
+        </ImageBackground>
       </Container>
     );
   }
@@ -144,5 +192,5 @@ class Login extends Component {
 
 export default connect(
   null,
-  { loginEmailPasswordUser }
+  { loginEmailPasswordUser, loginFacebookUser }
 )(Login);
